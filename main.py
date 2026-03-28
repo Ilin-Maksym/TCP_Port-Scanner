@@ -1,43 +1,51 @@
-import socket;
-import subprocess;
+#!/bin/env python3
+import argparse;
 import sys;
+import time;
 
-from datetime import datetime;
+from src import scan_ports, resolve_host, parse_port_range;
 
-subprocess.call("clear", shell=True);
+def main():
+  p = argparse.ArgumentParser(description="Multithreaded TCP port scanner");
 
-remoteServer = input("Enter a remote host to scan: ");
-remoteServerIP = socket.gethostname();
+  p.add_argument("host", help="Target hostname or IP");
+  p.add_argument("-p", "--ports", default="1-1024", help="Ports (single, range, comma-separated). Default: 1-1024");
+  p.add_argument("-t", "--timeout", type=float, default=1.0, help="Per-port timeout (seconds)");
+  p.add_argument("-w", "--workers", type=int, default=200, help="Max concurrent threads");
+  p.add_argument("-s", "--show-closed", action="store_true", help="Also print closed ports");
 
-print("_" * 60);
-print ("Please wait, scanning remote host", remoteServerIP);
-print ("_" * 60);
+  args = p.parse_args();
 
-t1 = datetime.now();
+  try:
+    ip, hostname = resolve_host(args.host);
+  except ValueError as e:
+    print(e, file=sys.stderr);
+    sys.exit(1);
 
-try:
-  for port in range (1,5000):
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM);
-    result = sock.connect_ex((remoteServerIP, port));
+  ports = parse_port_range(args.ports);
 
-    if result == 0:
-      print == 0;
+  if not ports:
+    print("No valid ports parsed.", file=sys.stderr);
+    sys.exit(1);
 
-    sock.close();
-except KeyboardInterrupt:
-  print ("You pressed Ctrl+C");
-  sys.exit();
+  print(f"Scanning {hostname} ({ip}) {len(ports)} ports with timeout={args.timeout}s workers={args.workers}");
 
-except socket.gaierror:
-  print ("Hostname could not be resolved. Exiting.");
-  sys.exit();
+  start = time.time();
+  results = scan_ports(ip, ports, timeout=args.timeout, max_workers=args.workers);
+  elapsed = time.time() - start;
 
-except socket.error:
-  print ("Couldn't connect to server.");
-  sys.exit();
+  open_ports = [p for p, open_ in results if open_];
 
-t2 = datetime.now();
+  for port, open_ in results:
+    if open_:
+      print(f"P{port:5d}/tcp OPEN");
+    elif args.show_closed:
+      print(f"{port:5d}/tcp closed");
 
-total = t2 - t1;
+  print(f"\nScan completed in {elapsed:.2f}s. Open ports: {len(open_ports)}");
 
-print ("Scanning Completed in: ", total) ;
+  if open_ports:
+    print("Open port list:", ", ".join(str(p) for p in open_ports));
+
+if __name__ == "__main__":
+  main();
