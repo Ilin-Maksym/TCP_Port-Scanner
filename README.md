@@ -22,8 +22,10 @@ shows how to build a simple, user‑friendly CLI tool.
   * No external packages
 
 # Installation
-  git clone "https://github.com/Ilin-Maksym/TCP_Port-Scanner.git"<br />
+  git clone "https://github.com/Ilin-Maksym/TCP_Port-Scanner.git"
+
   cd TCP_Port-Scanner<br />
+
   chmod +x main.py<br />
 
 Alternatively run with "python3 main.py".
@@ -59,9 +61,13 @@ Alternatively run with "python3 main.py".
 
 # Example output
 Scanning example.com (93.184.216.34) 1024 ports with timeout=1.0s workers=200
+
    22/tcp OPEN
+
    80/tcp OPEN
+
   443/tcp OPEN
+
 
 Scan completed in 2.34s. Open ports: 3
 Open port list: 22, 80, 443
