@@ -22,9 +22,9 @@ shows how to build a simple, user‑friendly CLI tool.
   * No external packages
 
 # Installation
-  git clone "https://github.com/Ilin-Maksym/TCP_Port-Scanner.git"
-  cd TCP_Port-Scanner
-  chmod +x main.py
+  git clone "https://github.com/Ilin-Maksym/TCP_Port-Scanner.git"<br />
+  cd TCP_Port-Scanner<br />
+  chmod +x main.py<br />
 
 Alternatively run with "python3 main.py".
 
